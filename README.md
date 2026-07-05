@@ -28,15 +28,13 @@
 rag-knowledge-assistant/
 ├── hybrid_assistant.py     # 主程序（混合助手）
 ├── pdf_loader.py           # PDF 加载与入库工具
-├── requirements.txt
-├── .env                    # API Key 配置
-├── knowledge/              # 存放知识库文档
+├── requirements.txt        # 项目依赖清单
+├── .env                    # 密钥、接口地址等环境配置
+├── knowledge/              # 原始知识库文档目录
 │   ├── company_policy.txt
 │   └── company_policy.pdf
-├── vector_db/              # Chroma 向量数据库（自动生成）
-└── README.md
-text## 快速开始
-
+├── vector_db/              # Chroma 向量库持久化存储（程序自动生成）
+└── README.md               # 项目说明文档
 ### 1. 安装依赖
 
 ```bash
