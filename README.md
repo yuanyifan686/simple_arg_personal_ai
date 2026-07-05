@@ -1,88 +1,152 @@
-# 混合智能助手 (Hybrid RAG Assistant)
+# 混合智能助手 \(Hybrid RAG Assistant\)
 
-一个支持**普通聊天 + 知识库问答**的命令行 AI 助手，具备本地 RAG 能力，可动态上传 PDF 文档，并显示答案来源。
+一个支持**普通聊天 \+ 本地知识库问答**的命令行 AI 助手，内置完整本地 RAG 能力，支持动态 PDF 上传、文档溯源、多轮对话记忆，所有数据本地存储，隐私安全。
 
 ## 项目简介
 
-本项目将传统聊天机器人与 RAG（检索增强生成）技术结合，实现了一个既能正常对话，又能基于本地知识库精准回答问题的混合助手。所有数据本地存储，隐私性较好。
+本项目融合大模型对话能力与 RAG 检索增强技术，打造**混合式智能问答助手**。无需部署复杂服务，本地即可运行。既能进行通用多轮 AI 对话，又能精准读取本地私有知识库内容作答，完美适配企业内部文档、规章制度、学习资料等私有场景问答。
 
 ## 主要功能
 
-- ✅ 普通多轮对话（支持记忆）
-- ✅ 基于本地知识库的智能问答（RAG）
-- ✅ 支持 TXT、MD、PDF 文件
-- ✅ 动态上传 PDF（`/upload` 命令）
-- ✅ 回答时显示参考来源（已去重）
-- ✅ 本地向量化存储（Chroma + BGE 模型）
-- ✅ 易于切换不同大模型（OpenAI 兼容接口）
+- ✅ **多轮记忆对话**：支持上下文记忆，连续聊天不中断
+
+- ✅ **本地 RAG 知识库问答**：基于私有文档精准回答，杜绝幻觉
+
+- ✅ **多格式文档支持**：兼容 PDF / TXT / MD 文本文档
+
+- ✅ **动态 PDF 入库**：运行中通过命令实时上传、加载文档
+
+- ✅ **答案溯源展示**：自动展示回答来源文档与页码，支持去重
+
+- ✅ **本地向量存储**：基于 Chroma 轻量化向量数据库，数据不落公网
+
+- ✅ **通用模型适配**：兼容所有 OpenAI 接口格式大模型（MiniMax、Grok 等）
+
+- ✅ **精美终端UI**：基于 Rich 库美化交互界面，体验整洁
 
 ## 技术栈
 
-- Python + LangChain
-- Chroma（本地向量数据库）
-- HuggingFace Embeddings（BAAI/bge-small-zh-v1.5）
-- OpenAI 兼容接口（支持 MiniMax、Grok 等）
-- Rich（美化终端输出）
+- Python 3\.10\+
+
+- LangChain（RAG 流程编排）
+
+- Chroma DB（本地向量数据库）
+
+- BAAI/bge\-small\-zh\-v1\.5（中文嵌入模型）
+
+- OpenAI 兼容 LLM 接口
+
+- Rich（终端美化输出）
 
 ## 项目结构
-```
+
+```text
 rag-knowledge-assistant/
-├── hybrid_assistant.py     # 主程序（混合助手）
-├── pdf_loader.py           # PDF 加载与入库工具
-├── requirements.txt
-├── .env                    # API Key 配置
-├── knowledge/              # 存放知识库文档
+├── hybrid_assistant.py     # 项目主程序、对话&RAG核心逻辑
+├── pdf_loader.py           # PDF解析、切片、向量化入库工具
+├── requirements.txt        # 项目依赖列表
+├── .env                    # 私密配置（API_KEY、模型地址等）
+├── knowledge/              # 静态知识库文档目录
 │   ├── company_policy.txt
 │   └── company_policy.pdf
-├── vector_db/              # Chroma 向量数据库（自动生成）
-└── README.md
+├── vector_db/              # Chroma向量数据库目录（程序自动生成）
+└── README.md               # 项目说明文档
 
 ```
 
-### 1. 安装依赖
+## 快速开始
+
+### 1\. 环境安装
 
 ```bash
+# 创建虚拟环境
 python -m venv venv
-venv\Scripts\activate          # Windows
 
+# 激活虚拟环境（Windows）
+venv\Scripts\activate
+
+# 安装所有依赖
 pip install -r requirements.txt
 
-### 2. 配置 API Key
-创建 .env 文件：
-envMINIMAX_API_KEY=sk-你的MiniMax_API_Key
-### 3. 运行助手
-Bashpython hybrid_assistant.py
-### 使用说明
-基本对话
-直接输入问题即可，支持普通聊天和知识库问答。
-上传 PDF
-在对话中输入以下命令即可上传并加入知识库：
-text/upload D:\path\to\your\file.pdf
-上传成功后，后续提问可直接使用新内容。
-查看来源
-回答知识库相关问题时，底部会显示参考来源，例如：
-text╭───────────────────────────────────── 📚 参考来源 ─────────────────────────────────────╮
+```
+
+### 2\. 配置环境变量
+
+在项目根目录新建 `.env` 文件，填入你的模型密钥：
+
+```env
+MINIMAX_API_KEY=sk-你的API密钥
+
+```
+
+### 3\. 启动助手
+
+```bash
+python hybrid_assistant.py
+
+```
+
+## 使用说明
+
+### 基础对话
+
+直接输入问题即可，程序自动判断：通用问题走大模型对话、专业知识库问题走 RAG 检索回答。
+
+### 动态上传 PDF 知识库
+
+在终端对话界面输入以下命令，可实时加载新 PDF 进入知识库：
+
+```text
+/upload D:\path\to\your\file.pdf
+
+```
+
+上传成功后，即刻生效，后续问答可直接调用该文档内容。
+
+### 溯源查看
+
+知识库问答会自动展示文档来源，示例效果：
+
+```text
+╭───────────────────────────────────── 📚 参考来源 ─────────────────────────────────────╮
 │ • company_policy.pdf (第 1 页) │
 │ • company_intro.txt │
 ╰───────────────────────────────────────────────────────────────────────────────────────╯
-退出
-输入 exit、quit 或 退出 即可退出程序。
-配置说明
+```
 
-修改模型：在 hybrid_assistant.py 中调整 MODEL_NAME 和 BASE_URL
-调整检索数量：修改 get_relevant_context_and_sources() 中的 k 值
-记忆长度：修改 MAX_HISTORY 常量
+### 退出程序
 
-### 注意事项
+输入 `exit` / `quit` / `退出` 即可关闭终端助手。
 
-首次运行会自动下载 Embedding 模型（BAAI/bge-small-zh-v1.5），请保持网络通畅
-建议所有文档统一使用 UTF-8 编码
-扫描版 PDF 目前无法提取文字（需后续增加 OCR 支持）
+## 自定义配置
 
-未来优化方向
+- **切换大模型**：修改 `hybrid_assistant.py` 中 `MODEL_NAME`、`BASE_URL`
 
- 支持更多文件格式（Word、Excel、网页）
- 优化来源显示（显示片段内容）
- 增加知识库管理命令（查看、删除文档）
- 支持流式输出
- 持久化对话历史
+- **调整检索条数**：修改检索函数内 `k` 值，控制返回参考片段数量
+
+- **对话记忆长度**：修改全局常量 `MAX_HISTORY`
+
+## 注意事项
+
+- 首次运行会自动下载中文 Embedding 模型，请保证网络通畅
+
+- 知识库文档建议统一使用 **UTF\-8 编码**，避免乱码
+
+- 当前仅支持**可复制文字的电子PDF**，扫描版图片PDF暂不支持（待OCR迭代）
+
+- `.env` 文件请勿上传至代码仓库，避免密钥泄露
+
+## 未来优化方向
+
+- 🔲 支持 Word / Excel / 网页等更多文件格式
+
+- 🔲 增加 OCR 识别，支持扫描版 PDF
+
+- 🔲 溯源展示具体文本片段
+
+- 🔲 实现知识库文档查看、删除、重置命令
+
+- 🔲 支持大模型流式输出回答
+
+- 🔲 持久化保存对话历史记录
+
